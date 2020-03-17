@@ -25,9 +25,10 @@ public class HW4 {
 
 		//Part 1
 		//test.city();
+		
 		//Part 2
 		test.addUser();
-
+		
 		//some of Part 6
         test.disConnect();
     }
@@ -50,38 +51,66 @@ public class HW4 {
 		query(queryAgents);
 		query(queryClients);
 	}
-	
+
+	//Add user to CLIENTS table
 	public void addUser()throws SQLException {
-        try {
-		//Get highest ID value in CLIENTS table
-		int max = 0;
-		statement = connection.createStatement();
-		String sql = "SELECT MAX(C_ID) from CLIENTS";
-		ResultSet rs = statement.executeQuery(sql);
-		if (rs.next()) 
-			max = rs.getInt(1);
-		
-		//Ask for user details
-		Scanner userInput = new Scanner(System.in);
-		String userName, userCity, userZip;
-		System.out.print("Enter name: ");
-		userName = userInput.next();
-		System.out.print("Enter city: ");
-		userCity = userInput.next();
-		System.out.print("Enter zipcode: ");
-		userZip = userInput.next();
-		int userID = max + 1;
-		
-		//Insert user IDs into CLIENTS table
-		insert("CLIENTS", "'" + userID + "', '" + userName + "', '" + userCity + "', '" + userZip + "'");
-		String queryClients = "SELECT * FROM CLIENTS";
-		query(queryClients);
+		try {
+			//Get highest ID value in CLIENTS table
+			int max = 0;
+			statement = connection.createStatement();
+			String queryID = "SELECT MAX(C_ID) from CLIENTS";
+			ResultSet rs = statement.executeQuery(queryID);
+			if (rs.next()) 
+				max = rs.getInt(1);
+			
+			//Ask for user details
+			Scanner userInput = new Scanner(System.in);
+			String userName, userCity, userZip;
+			System.out.print("Enter name: ");
+			userName = userInput.next();
+			System.out.print("Enter city: ");
+			userCity = userInput.next();
+			System.out.print("Enter zipcode: ");
+			userZip = userInput.next();
+			int userID = max + 1;
+			
+			//Insert user IDs into CLIENTS table
+			insert("CLIENTS", "'" + userID + "', '" + userName + "', '" + userCity + "', '" + userZip + "'");
+			String queryClients = "SELECT * FROM CLIENTS";
+			query(queryClients);
+			buyPolicy(userCity);
 		}
 		catch (Exception e) {
             throw e;
         }
 	}
 	
+	public void buyPolicy(String city)throws SQLException {
+        try {
+			Scanner userInput = new Scanner(System.in);
+			String type, amount;
+			System.out.print("Enter type of policy you want to purchase: ");
+			type = userInput.next();
+			
+			String queryType = "SELECT TYPE FROM POLICY WHERE TYPE = '" + type + "'";
+			ResultSet rsType = statement.executeQuery(queryType);
+			if (rsType.next()) 
+			{
+				String queryCity = "SELECT * FROM AGENTS WHERE A_CITY = '" + city + "'";
+				ResultSet rsCity = statement.executeQuery(queryCity);
+				if (rsCity.next()) 
+				{
+					System.out.println("Found city");
+					query(queryCity);
+				}
+			}
+			else
+				System.out.println("No type of policy");
+		}
+		catch (Exception e) {
+            throw e;
+        }
+	}
 
     // Connect to the database
     public void connect(String Username, String mysqlPassword) throws SQLException {

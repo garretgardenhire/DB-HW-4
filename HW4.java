@@ -16,15 +16,19 @@ public class HW4 {
 
     // The main program, that tests the methods
     public static void main(String[] args) throws SQLException {
-        String Username = "YOURS";              // Change to your own username
-        String mysqlPassword = "YOURS";    // Change to your own mysql Password
+        String Username = "anyates";              // Change to your own username
+        String mysqlPassword = "Simonsays2025!";    // Change to your own mysql Password
 
         HW4 test = new HW4();
         test.connect(Username, mysqlPassword);
         test.initDatabase(Username, mysqlPassword, Username);
 
-		test.city();
+		//Part 1
+		//test.city();
+		//Part 2
+		test.addUser();
 
+		//some of Part 6
         test.disConnect();
     }
 	
@@ -41,12 +45,43 @@ public class HW4 {
 								
 		String queryClients = "SELECT * " +
 								"FROM CLIENTS " +
-								"WHERE C_CITY = '" + cityName + "'";						
-								
+								"WHERE C_CITY = '" + cityName + "'";											
 								
 		query(queryAgents);
 		query(queryClients);
 	}
+	
+	public void addUser()throws SQLException {
+        try {
+		//Get highest ID value in CLIENTS table
+		int max = 0;
+		statement = connection.createStatement();
+		String sql = "SELECT MAX(C_ID) from CLIENTS";
+		ResultSet rs = statement.executeQuery(sql);
+		if (rs.next()) 
+			max = rs.getInt(1);
+		
+		//Ask for user details
+		Scanner userInput = new Scanner(System.in);
+		String userName, userCity, userZip;
+		System.out.print("Enter name: ");
+		userName = userInput.next();
+		System.out.print("Enter city: ");
+		userCity = userInput.next();
+		System.out.print("Enter zipcode: ");
+		userZip = userInput.next();
+		int userID = max + 1;
+		
+		//Insert user IDs into CLIENTS table
+		insert("CLIENTS", "'" + userID + "', '" + userName + "', '" + userCity + "', '" + userZip + "'");
+		String queryClients = "SELECT * FROM CLIENTS";
+		query(queryClients);
+		}
+		catch (Exception e) {
+            throw e;
+        }
+	}
+	
 
     // Connect to the database
     public void connect(String Username, String mysqlPassword) throws SQLException {
@@ -129,47 +164,44 @@ public class HW4 {
     // Remove all records and fill them with values for testing
     // Assumes that the tables are already created
     public void initDatabase(String Username, String Password, String SchemaName) throws SQLException {
-        statement = connection.createStatement();
-        statement.executeUpdate("DELETE from FoodOrder");
-        statement.executeUpdate("DELETE from MenuItem");
-        statement.executeUpdate("DELETE from Dish");
-        statement.executeUpdate("DELETE from Restaurant");
+		statement = connection.createStatement();
+		
+		//DELETE FROM HERE ON IF DON'T WANT TO DELETE DATABASE EACH TIME
+		statement.executeUpdate("DELETE from POLICIES_SOLD");
+        statement.executeUpdate("DELETE from CLIENTS");
+        statement.executeUpdate("DELETE from AGENTS");
+        statement.executeUpdate("DELETE from POLICY");
 
-        insert("Restaurant", "0, 'Tasty Thai', 'Asian', 'Dallas'");
-        insert("Restaurant", "3,'Eureka Pizza','Pizza', 'Fayetteville'");
-        insert("Restaurant", "5,'Tasty Thai','Asian', 'Las Vegas'");
+        insert("CLIENTS", "101, 'CHRIS', 'DALLAS', 43214");
+        insert("CLIENTS", "102, 'OLIVIA', 'BOSTON', 83125");
+        insert("CLIENTS", "103, 'ETHAN', 'FAYETTEVILLE', 72701");
+		insert("CLIENTS", "104, 'DANIEL', 'NEWYORK', 53421");
+		insert("CLIENTS", "105, 'TAYLOR', 'ROGERS', 78291");
+		insert("CLIENTS", "106, 'CLAIRE', 'PHOENIX', 43214");
 
-        insert("Dish", "13,'Spring Roll','ap'");
-        insert("Dish", "15,'Pad Thai','en'");
-        insert("Dish", "16,'Pad Stickers','ap'");
-        insert("Dish", "22,'Masaman Curry','en'");
-        insert("Dish", "10,'Custard','ds'");
-        insert("Dish", "12,'Garlic Bread','ap'");
-        insert("Dish", "44,'Salad','ap'");
-        insert("Dish", "07,'Cheese Pizza','en'");
-        insert("Dish", "19,'Pepperoni Pizza','en'");
-        insert("Dish", "77,'Vegi Supreme Pizza','en'");
+		insert("AGENTS", "201, 'ANDRE', 'DALLAS', 43214");
+		insert("AGENTS", "202, 'PHILIP', 'PHEOENIX', 85011");
+		insert("AGENTS", "203, 'JERRY', 'BOSTON', 83125");
+		insert("AGENTS", "204, 'BRYAN', 'ROGERS', 78291");
+		insert("AGENTS", "205, 'TOMMY', 'DALLAS', 43214");
+		insert("AGENTS", "206, 'BRANT', 'FAYETTEVILLE', 72701");
+		insert("AGENTS", "207, 'SMITH', 'ROGERS', 78291");	
 
-        insert("MenuItem", "0,0,13,8.00");
-        insert("MenuItem", "1,0,16,9.00");
-        insert("MenuItem", "2,0,44,10.00");
-        insert("MenuItem", "3,0,15,19.00");
-        insert("MenuItem", "4, 0,22,19.00");
-        insert("MenuItem", "5, 3,44,6.25");
-        insert("MenuItem", "6, 3,12,5.50");
-        insert("MenuItem", "7, 3,7,12.50");
-        insert("MenuItem", "8, 3,19,13.50");
-        insert("MenuItem", "9,5,13,6.00");
-        insert("MenuItem", "10,5,15,15.00");
-        insert("MenuItem", "11,5,22,14.00");
+		insert("POLICY", "301, 'CIGNAHEALTH', 'DENTAL', 5");
+		insert("POLICY", "302, 'GOLD', 'LIFE', 8");
+		insert("POLICY", "303, 'WELLCARE', 'HOME', 10");
+		insert("POLICY", "304, 'UNITEDHEALTH', 'HEALTH', 7");
+		insert("POLICY", "305, 'UNITEDCAR', 'VEHICLE', 9");
 
-        insert("FoodOrder", "0,2,STR_To_DATE('01,03,2017', '%d,%m,%Y'), '10:30'");
-        insert("FoodOrder", "1,0,STR_To_DATE('02,03,2017', '%d,%m,%Y'), '15:33'");
-        insert("FoodOrder", "2,3,STR_To_DATE('01,03,2017', '%d,%m,%Y'), '15:35'");
-        insert("FoodOrder", "3,5,STR_To_DATE('03,03,2017', '%d,%m,%Y'), '21:00'");
-        insert("FoodOrder", "4,7,STR_To_DATE('01,03,2017', '%d,%m,%Y'), '18:11'");
-        insert("FoodOrder", "5,7,STR_To_DATE('04,03,2017', '%d,%m,%Y'), '18:51'");
-        insert("FoodOrder", "6,9,STR_To_DATE('01,03,2017', '%d,%m,%Y'), '19:00'");
-        insert("FoodOrder", "7,11,STR_To_DATE('05,03,2017', '%d,%m,%Y'), '17:15'");
+		insert("POLICIES_SOLD", "401, 204, 106, 303, '2020-01-02', 2000.00");
+		insert("POLICIES_SOLD", "402, 201, 105, 305, '2019-08-11', 1500.00");
+		insert("POLICIES_SOLD", "403, 203, 106, 301, '2019-09-08', 3000.00");
+		insert("POLICIES_SOLD", "404, 207, 101, 305, '2019-06-21', 1500.00");
+		insert("POLICIES_SOLD", "405, 203, 104, 302, '2019-11-14', 4500.00");
+		insert("POLICIES_SOLD", "406, 207, 105, 305, '2019-12-25', 1500.00");
+		insert("POLICIES_SOLD", "407, 205, 103, 304, '2020-10-15', 5000.00");
+		insert("POLICIES_SOLD", "408, 204, 103, 304, '2020-02-15', 5000.00");
+		insert("POLICIES_SOLD", "409, 203, 103, 304, '2020-01-10', 5000.00");
+		insert("POLICIES_SOLD", "410, 202, 103, 303, '2020-01-30', 2000.00");
     }
 }

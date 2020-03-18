@@ -1,6 +1,9 @@
 //bash file permission denied: chmod u+x compileandrun.bash
 import java.sql.*;
 import java.util.Scanner;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class HW4 {
 
@@ -22,7 +25,7 @@ public class HW4 {
         HW4 test = new HW4();
         test.connect(Username, mysqlPassword);
         test.initDatabase(Username, mysqlPassword, Username);
-
+		
 		//Part 1
 		//test.city();
 		
@@ -32,7 +35,7 @@ public class HW4 {
 		//some of Part 6
         test.disConnect();
     }
-	
+	//Display agents and clients from a certain city
 	public void city ()
 	{
 		Scanner userInput = new Scanner(System.in);
@@ -56,8 +59,8 @@ public class HW4 {
 	public void addUser()throws SQLException {
 		try {
 			//Get highest ID value in CLIENTS table
-			int max = 0;
 			statement = connection.createStatement();
+			int max = 0;
 			String queryID = "SELECT MAX(C_ID) from CLIENTS";
 			ResultSet rs = statement.executeQuery(queryID);
 			if (rs.next()) 
@@ -74,38 +77,99 @@ public class HW4 {
 			userZip = userInput.next();
 			int userID = max + 1;
 			
-			//Insert user IDs into CLIENTS table
+			//Insert user ID into CLIENTS table
 			insert("CLIENTS", "'" + userID + "', '" + userName + "', '" + userCity + "', '" + userZip + "'");
 			String queryClients = "SELECT * FROM CLIENTS";
 			query(queryClients);
-			buyPolicy(userCity);
+			
+			//Send the clients ID and city to lookupPolicy
+			lookupPolicy(userCity, userID);
 		}
 		catch (Exception e) {
             throw e;
         }
 	}
 	
-	public void buyPolicy(String city)throws SQLException {
+	//Check agents and type of policy
+	public void lookupPolicy(String city, int clientID)throws SQLException {
         try {
 			Scanner userInput = new Scanner(System.in);
 			String type, amount;
+			int agentID;
 			System.out.print("Enter type of policy you want to purchase: ");
 			type = userInput.next();
 			
 			String queryType = "SELECT TYPE FROM POLICY WHERE TYPE = '" + type + "'";
 			ResultSet rsType = statement.executeQuery(queryType);
+			//Check if policy type is found
 			if (rsType.next()) 
 			{
+				//Display all agents in the clients city
 				String queryCity = "SELECT * FROM AGENTS WHERE A_CITY = '" + city + "'";
 				ResultSet rsCity = statement.executeQuery(queryCity);
-				if (rsCity.next()) 
+				query(queryCity);
+				
+				//POTENTIALLY ADD COUNT AND AUTO PICK AGENT IF ONLY ONE
+				//Let user select the client they want to purchase the policy from
+				System.out.print("Enter ID of the agent you want to purchase the policy from: ");
+				agentID = userInput.nextInt();				
+				String queryAgent = "SELECT A_ID FROM AGENTS WHERE A_CITY = '" + city + "' AND A_ID = '" + agentID +"'";
+				ResultSet rsAgent = statement.executeQuery(queryAgent);
+				//If selected agent is valid, send agent ID and client ID to buyPolicy
+				if (rsAgent.next()) 
 				{
-					System.out.println("Found city");
-					query(queryCity);
+					agentID = rsAgent.getInt(1);
+					String queryAllP = "SELECT * FROM POLICY";
+					query(queryAllP);
+					buyPolicy(agentID, clientID);
 				}
+				else
+					System.out.println("Not a valid agent");
 			}
 			else
-				System.out.println("No type of policy");
+				System.out.println("That type of policy isn't available");
+		}
+		catch (Exception e) {
+            throw e;
+        }
+	}
+
+	//Buy policy and insert into table
+	public void buyPolicy(int agentID, int clientID) throws SQLException {
+		try {
+			Scanner userInput = new Scanner(System.in);
+			String policyID;
+			float amount;
+			System.out.print("Enter the POLICY_ID you want to purchase: ");
+			policyID = userInput.next();
+			
+			String queryComPer = "SELECT COMMISSION_PERCENTAGE FROM POLICY WHERE POLICY_ID = '" + policyID + "'";
+			ResultSet rsComPer = statement.executeQuery(queryComPer);
+			//Check if policy type is found
+			if (rsComPer.next()) 
+			{
+				statement = connection.createStatement();
+				
+				//Get today's date
+				java.util.Date utilDate = new java.util.Date();
+				java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+				
+				System.out.print("Enter the amount you want to purchase: ");
+				amount = userInput.nextFloat();
+				
+				//Get highest ID value in POLICIES_SOLD table
+				int max = 0;
+				String queryID = "SELECT MAX(PURCHASE_ID) from POLICIES_SOLD";
+				ResultSet rs = statement.executeQuery(queryID);
+				if (rs.next())					
+					max = rs.getInt(1);
+				int policiessoldID = max + 1;
+				insert("POLICIES_SOLD", "'" + policiessoldID + "', '" + agentID + "', '" + clientID + "', '" + policyID + "', '" + sqlDate +"' , '" + amount + "'");
+				String queryAllPS = "SELECT * FROM POLICIES_SOLD";
+				query(queryAllPS);
+			}
+			else
+				System.out.println("POLICY_ID not available");
 		}
 		catch (Exception e) {
             throw e;
@@ -196,7 +260,7 @@ public class HW4 {
 		statement = connection.createStatement();
 		
 		//DELETE FROM HERE ON IF DON'T WANT TO DELETE DATABASE EACH TIME
-		statement.executeUpdate("DELETE from POLICIES_SOLD");
+		/*statement.executeUpdate("DELETE from POLICIES_SOLD");
         statement.executeUpdate("DELETE from CLIENTS");
         statement.executeUpdate("DELETE from AGENTS");
         statement.executeUpdate("DELETE from POLICY");
@@ -231,6 +295,6 @@ public class HW4 {
 		insert("POLICIES_SOLD", "407, 205, 103, 304, '2020-10-15', 5000.00");
 		insert("POLICIES_SOLD", "408, 204, 103, 304, '2020-02-15', 5000.00");
 		insert("POLICIES_SOLD", "409, 203, 103, 304, '2020-01-10', 5000.00");
-		insert("POLICIES_SOLD", "410, 202, 103, 303, '2020-01-30', 2000.00");
+		insert("POLICIES_SOLD", "410, 202, 103, 303, '2020-01-30', 2000.00");*/
     }
 }

@@ -24,7 +24,8 @@ public class HW4 {
 
         HW4 test = new HW4();
         test.connect(Username, mysqlPassword);
-		test.initDatabase(Username, mysqlPassword, Username);
+        test.initDatabase(Username, mysqlPassword, Username);
+		
 		Scanner userInput = new Scanner(System.in);
 
 		int choice;
@@ -38,13 +39,13 @@ public class HW4 {
 			switch(choice)
 			{
 				case 1:
-					//code
+					test.Agents();
 					break;
 				case 2:
 					test.addUser();
 					break;
 				case 3:
-					//code
+					test.policiesSold();
 					break;
 				case 4:
 					//code
@@ -63,17 +64,7 @@ public class HW4 {
 					System.out.println("invalid choice");
 			}
 		}
-
-		
-		//Part 1
-		//test.city();
-		
-		//Part 2
-		//test.addUser();
-		
-		//some of Part 6
-        //test.disConnect();
-	}
+    }
 	
 	static public void menu()
 	{
@@ -87,9 +78,9 @@ public class HW4 {
 		System.out.println("6. Quit");
 		System.out.println(" ");
 	}
-
+	
 	//Display agents and clients from a certain city
-	public void city ()
+	public void Agents ()
 	{
 		Scanner userInput = new Scanner(System.in);
 		String cityName;
@@ -228,6 +219,37 @@ public class HW4 {
             throw e;
         }
 	}
+	
+	//List policies sold by agent
+	public void policiesSold()throws SQLException {
+		try {
+		Scanner userInput = new Scanner(System.in);
+		String agentCity, agentName;
+		System.out.print("Enter Agent's name: ");
+		agentName = userInput.next();
+		System.out.print("Enter Agent's city: ");
+		agentCity = userInput.next();
+		
+		String queryAgentID = "SELECT A_ID FROM AGENTS WHERE A_NAME = '" + agentName + "' AND A_CITY = '" + agentCity + "'";
+		ResultSet rsAgentID = statement.executeQuery(queryAgentID);
+		//Check if agent is found
+		if (rsAgentID.next())
+		{
+			int agentID = rsAgentID.getInt(1);
+			System.out.println("The agent was found");
+			String queryPoliciesSold = "SELECT P.NAME, P.TYPE, P.COMMISSION_PERCENTAGE " +
+								"FROM POLICY P, POLICIES_SOLD PS " +
+								"WHERE PS.AGENT_ID = '" + agentID + "' AND PS.POLICY_ID = P.POLICY_ID";										
+								
+			query(queryPoliciesSold);
+		}
+		else
+			System.out.println("The agent was not found");
+		}
+		catch (Exception e) {
+            throw e;
+        }
+	}
 
     // Connect to the database
     public void connect(String Username, String mysqlPassword) throws SQLException {
@@ -325,7 +347,7 @@ public class HW4 {
 		insert("CLIENTS", "105, 'TAYLOR', 'ROGERS', 78291");
 		insert("CLIENTS", "106, 'CLAIRE', 'PHOENIX', 43214");
 
-		insert("AGENTS", "201, 'ANDRE', 'DALLAS', 43214");
+		insert("AGENTS", "201, 'ANDREW', 'DALLAS', 43214");
 		insert("AGENTS", "202, 'PHILIP', 'PHEOENIX', 85011");
 		insert("AGENTS", "203, 'JERRY', 'BOSTON', 83125");
 		insert("AGENTS", "204, 'BRYAN', 'ROGERS', 78291");

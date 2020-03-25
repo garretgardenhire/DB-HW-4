@@ -57,6 +57,7 @@ public class HW4 {
 					test.disConnect();
 					userInput.close();
 					flag = false;
+					System.out.println("Program Ended");
 					break;
 				default:
 					System.out.println("invalid choice");
@@ -76,6 +77,7 @@ public class HW4 {
 	
 	static public void menu()
 	{
+		System.out.println(" ");
 		System.out.println("Menu:");
 		System.out.println("1. Find all existing agents in a given city");
 		System.out.println("2. Purchase an avaiable policy from a particular agent");
@@ -83,6 +85,7 @@ public class HW4 {
 		System.out.println("4. Cancel a policy");
 		System.out.println("5. Add a new agent for a city");
 		System.out.println("6. Quit");
+		System.out.println(" ");
 	}
 
 	//Display agents and clients from a certain city

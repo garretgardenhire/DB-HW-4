@@ -56,6 +56,7 @@ public class HW4 {
 					//code
 					test.disConnect();
 					userInput.close();
+					flag = false;
 					break;
 				default:
 					System.out.println("invalid choice");

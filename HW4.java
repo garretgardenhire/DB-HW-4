@@ -24,17 +24,66 @@ public class HW4 {
 
         HW4 test = new HW4();
         test.connect(Username, mysqlPassword);
-        test.initDatabase(Username, mysqlPassword, Username);
+		test.initDatabase(Username, mysqlPassword, Username);
+		Scanner userInput = new Scanner(System.in);
+
+		int choice;
+		boolean flag = true;
+
+		while(flag)
+		{
+			menu();
+			System.out.println("Enter Choice (by integer): ");
+			choice = userInput.nextInt();
+			switch(choice)
+			{
+				case 1:
+					//code
+					break;
+				case 2:
+					test.addUser();
+					break;
+				case 3:
+					//code
+					break;
+				case 4:
+					//code
+					break;
+				case 5:
+					//code
+					break;
+				case 6:
+					//code
+					test.disConnect();
+					userInput.close();
+					break;
+				default:
+					System.out.println("invalid choice");
+			}
+		}
+
 		
 		//Part 1
 		//test.city();
 		
 		//Part 2
-		test.addUser();
+		//test.addUser();
 		
 		//some of Part 6
-        test.disConnect();
-    }
+        //test.disConnect();
+	}
+	
+	static public void menu()
+	{
+		System.out.println("Menu:");
+		System.out.println("1. Find all existing agents in a given city");
+		System.out.println("2. Purchase an avaiable policy from a particular agent");
+		System.out.println("3. List all policies sold by a particular agent");
+		System.out.println("4. Cancel a policy");
+		System.out.println("5. Add a new agent for a city");
+		System.out.println("6. Quit");
+	}
+
 	//Display agents and clients from a certain city
 	public void city ()
 	{

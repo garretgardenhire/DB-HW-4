@@ -299,9 +299,10 @@ public class HW4 {
 
 			Scanner userInput = new Scanner(System.in);
 			String purchID;
+			System.out.println("Enter Purchase ID of policy to be cancelled: ");
 			purchID = userInput.next();
 
-			String queryPolicy = "DELETE * FROM POLICIES_SOLD WHERE " +
+			String queryPolicy = "DELETE FROM POLICIES_SOLD WHERE " +
 									"PURCHASE_ID = " + purchID;
 			queryUp(queryPolicy);
 			query(queryPoliciesSold);

@@ -294,8 +294,17 @@ public class HW4 {
 	public void cancelPolicy() throws SQLException
 	{
 		try {
-			String queryClients = "SELECT * FROM AGENTS";
-			query(queryClients);
+			String queryPoliciesSold = "SELECT * FROM POLICIES_SOLD";
+			query(queryPoliciesSold);
+
+			Scanner userInput = new Scanner(System.in);
+			String purchID;
+			purchID = userInput.next();
+
+			String queryPolicy = "DELETE * FROM POLICIES_SOLD WHERE " +
+									"PURCHASED_ID = " + purchID;
+			query(queryPolicy);
+			query(queryPoliciesSold);
 			
 			/*//Get highest ID value in AGENTS table
 			statement = connection.createStatement();
@@ -319,9 +328,9 @@ public class HW4 {
 			//Insert user ID into AGENTS table
 			insert("AGENTS", "'" + userID + "', '" + userName + "', '" + userCity + "', '" + userZip + "'");
 			String queryClients = "SELECT * FROM AGENTS";
-			query(queryClients);
+			query(queryClients);*/
 			
-			userInput.close();*/
+			userInput.close();
 		}
 		catch (Exception e) {
             throw e;

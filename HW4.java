@@ -152,10 +152,10 @@ public class HW4 {
 			String userName, userCity, userZip;
 			System.out.print("Enter city: ");
 			userCity = userInput.next();
-			System.out.print("Enter name: ");
-			userName = userInput.next();
 			System.out.print("Enter zipcode: ");
 			userZip = userInput.next();
+			System.out.print("Enter name: ");
+			userName = userInput.next();
 			int userID = max + 1;
 			
 			//Insert user ID into AGENTS table

@@ -163,8 +163,6 @@ public class HW4 {
 			String queryClients = "SELECT * FROM AGENTS";
 			query(queryClients);
 			
-			//Send the AGENTS ID and city to lookupPolicy
-			lookupPolicy(userCity, userID);
 			userInput.close();
 		}
 		catch (Exception e) {

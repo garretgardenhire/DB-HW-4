@@ -302,7 +302,7 @@ public class HW4 {
 			purchID = userInput.next();
 
 			String queryPolicy = "DELETE * FROM POLICIES_SOLD WHERE " +
-									"PURCHASED_ID = " + purchID;
+									"PURCHASE_ID = " + purchID;
 			queryUp(queryPolicy);
 			query(queryPoliciesSold);
 

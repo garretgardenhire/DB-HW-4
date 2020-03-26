@@ -37,7 +37,7 @@ public class HW4 {
 				menu();
 				System.out.println("Enter Choice (by integer): ");
 				choice = userInput.nextInt();
-				switch(choice)
+				switch(choice)  //it ends the program for some reason
 				{
 					case 1:
 						test.Agents();
@@ -49,7 +49,7 @@ public class HW4 {
 						test.policiesSold();
 						break;
 					case 4:
-						test.cancelPolicy();
+						test.cancelPolicy(); //broken, not sure why it ends program
 						break;
 					case 5:
 						test.addAgent();  //broken, not sure why it ends program
@@ -57,6 +57,8 @@ public class HW4 {
 					case 6:
 						test.disConnect();
 						flag = false;
+						userInput.close();
+						System.out.println("Program Ended");
 						break;
 					default:
 						System.out.println("invalid choice");
@@ -67,8 +69,6 @@ public class HW4 {
 			}
 		}
 
-		userInput.close();
-		System.out.println("Program Ended");
 	}
 	
 	static public void menu()

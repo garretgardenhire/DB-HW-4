@@ -48,23 +48,23 @@ public class HW4 {
 					test.policiesSold();
 					break;
 				case 4:
-					//code
+					test.cancelPolicy();
 					break;
 				case 5:
-					//code
+					test.addAgent();
 					break;
 				case 6:
-					//code
 					test.disConnect();
-					userInput.close();
 					flag = false;
-					System.out.println("Program Ended");
 					break;
 				default:
 					System.out.println("invalid choice");
 			}
 		}
-    }
+
+		userInput.close();
+		System.out.println("Program Ended");
+	}
 	
 	static public void menu()
 	{
@@ -128,6 +128,44 @@ public class HW4 {
 			
 			//Send the clients ID and city to lookupPolicy
 			lookupPolicy(userCity, userID);
+			userInput.close();
+		}
+		catch (Exception e) {
+            throw e;
+        }
+	}
+
+	//add a new agent
+	public void addAgent() throws SQLException
+	{
+		try {
+			//Get highest ID value in AGENTS table
+			statement = connection.createStatement();
+			int max = 0;
+			String queryID = "SELECT MAX(C_ID) from AGENTS";
+			ResultSet rs = statement.executeQuery(queryID);
+			if (rs.next()) 
+				max = rs.getInt(1);
+			
+			//Ask for user details
+			Scanner userInput = new Scanner(System.in);
+			String userName, userCity, userZip;
+			System.out.print("Enter city: ");
+			userCity = userInput.next();
+			System.out.print("Enter name: ");
+			userName = userInput.next();
+			System.out.print("Enter zipcode: ");
+			userZip = userInput.next();
+			int userID = max + 1;
+			
+			//Insert user ID into AGENTS table
+			insert("AGENTS", "'" + userID + "', '" + userName + "', '" + userCity + "', '" + userZip + "'");
+			String queryClients = "SELECT * FROM AGENTS";
+			query(queryClients);
+			
+			//Send the AGENTS ID and city to lookupPolicy
+			lookupPolicy(userCity, userID);
+			userInput.close();
 		}
 		catch (Exception e) {
             throw e;
@@ -172,6 +210,7 @@ public class HW4 {
 			}
 			else
 				System.out.println("That type of policy isn't available");
+				userInput.close();
 		}
 		catch (Exception e) {
             throw e;
@@ -214,6 +253,7 @@ public class HW4 {
 			}
 			else
 				System.out.println("POLICY_ID not available");
+			userInput.close();
 		}
 		catch (Exception e) {
             throw e;
@@ -245,10 +285,17 @@ public class HW4 {
 		}
 		else
 			System.out.println("The agent was not found");
+		userInput.close();
 		}
 		catch (Exception e) {
             throw e;
         }
+	}
+
+	//cancel a policy
+	public void cancelPolicy()
+	{
+
 	}
 
     // Connect to the database

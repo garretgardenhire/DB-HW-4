@@ -303,9 +303,9 @@ public class HW4 {
 
 			String queryPolicy = "DELETE * FROM POLICIES_SOLD WHERE " +
 									"PURCHASED_ID = " + purchID;
-			query(queryPolicy);
+			queryUp(queryPolicy);
 			query(queryPoliciesSold);
-			
+
 			/*//Get highest ID value in AGENTS table
 			statement = connection.createStatement();
 			int max = 0;
@@ -364,6 +364,18 @@ public class HW4 {
             System.out.println("\n---------------------------------");
             System.out.println("Query: \n" + q + "\n\nResult: ");
             print(resultSet);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+	}
+	
+	public void queryUp(String q) {
+        try {
+            int resultSet = statement.executeUpdate(q);
+            System.out.println("\n---------------------------------");
+            //System.out.println("Query: \n" + q + "\n\nResult: ");
+            //print(resultSet);
         }
         catch (SQLException e) {
             e.printStackTrace();

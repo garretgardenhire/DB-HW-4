@@ -33,32 +33,37 @@ public class HW4 {
 
 		while(flag)
 		{
-			menu();
-			System.out.println("Enter Choice (by integer): ");
-			choice = userInput.nextInt();
-			switch(choice)
-			{
-				case 1:
-					test.Agents();
-					break;
-				case 2:
-					test.addUser();
-					break;
-				case 3:
-					test.policiesSold();
-					break;
-				case 4:
-					test.cancelPolicy();
-					break;
-				case 5:
-					test.addAgent();  //broken, not sure why it ends program
-					break;
-				case 6:
-					test.disConnect();
-					flag = false;
-					break;
-				default:
-					System.out.println("invalid choice");
+			try{
+				menu();
+				System.out.println("Enter Choice (by integer): ");
+				choice = userInput.nextInt();
+				switch(choice)
+				{
+					case 1:
+						test.Agents();
+						break;
+					case 2:
+						test.addUser();
+						break;
+					case 3:
+						test.policiesSold();
+						break;
+					case 4:
+						test.cancelPolicy();
+						break;
+					case 5:
+						test.addAgent();  //broken, not sure why it ends program
+						break;
+					case 6:
+						test.disConnect();
+						flag = false;
+						break;
+					default:
+						System.out.println("invalid choice");
+				}
+			}
+			catch (java.util.InputMismatchException err) {
+				System.out.println("");
 			}
 		}
 

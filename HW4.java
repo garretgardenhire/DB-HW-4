@@ -51,7 +51,7 @@ public class HW4 {
 					test.cancelPolicy();
 					break;
 				case 5:
-					test.addAgent();
+					test.addAgent();  //broken, not sure why it ends program
 					break;
 				case 6:
 					test.disConnect();
@@ -291,9 +291,41 @@ public class HW4 {
 	}
 
 	//cancel a policy
-	public void cancelPolicy()
+	public void cancelPolicy() throws SQLException
 	{
-
+		try {
+			String queryClients = "SELECT * FROM AGENTS";
+			query(queryClients);
+			
+			/*//Get highest ID value in AGENTS table
+			statement = connection.createStatement();
+			int max = 0;
+			String queryID = "SELECT MAX(A_ID) from AGENTS";
+			ResultSet rs = statement.executeQuery(queryID);
+			if (rs.next()) 
+				max = rs.getInt(1);
+			
+			//Ask for user details
+			Scanner userInput = new Scanner(System.in);
+			String userName, userCity, userZip;
+			System.out.print("Enter city: ");
+			userCity = userInput.next();
+			System.out.print("Enter zipcode: ");
+			userZip = userInput.next();
+			System.out.print("Enter name: ");
+			userName = userInput.next();
+			int userID = max + 1;
+			
+			//Insert user ID into AGENTS table
+			insert("AGENTS", "'" + userID + "', '" + userName + "', '" + userCity + "', '" + userZip + "'");
+			String queryClients = "SELECT * FROM AGENTS";
+			query(queryClients);
+			
+			userInput.close();*/
+		}
+		catch (Exception e) {
+            throw e;
+        }
 	}
 
     // Connect to the database

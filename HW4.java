@@ -142,7 +142,7 @@ public class HW4 {
 			//Get highest ID value in AGENTS table
 			statement = connection.createStatement();
 			int max = 0;
-			String queryID = "SELECT MAX(C_ID) from AGENTS";
+			String queryID = "SELECT MAX(A_ID) from AGENTS";
 			ResultSet rs = statement.executeQuery(queryID);
 			if (rs.next()) 
 				max = rs.getInt(1);

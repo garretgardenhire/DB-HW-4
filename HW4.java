@@ -1,4 +1,4 @@
-//bash file permission denied: chmod u+x compileandrun.bash
+//INFINTIE LOOP WITH LETTERS
 import java.sql.*;
 import java.util.Scanner;
 import java.text.SimpleDateFormat;
@@ -49,15 +49,14 @@ public class HW4 {
 						test.policiesSold();
 						break;
 					case 4:
-						test.cancelPolicy(); //broken, not sure why it ends program
+						test.cancelPolicy();
 						break;
 					case 5:
-						test.addAgent();  //broken, not sure why it ends program
+						test.addAgent();
 						break;
 					case 6:
 						test.disConnect();
 						flag = false;
-						userInput.close();
 						System.out.println("Program Ended");
 						break;
 					default:
@@ -85,26 +84,26 @@ public class HW4 {
 	}
 	
 	//Display agents and clients from a certain city
-	public void Agents ()
+	//Part 1
+	public void Agents()
 	{
 		Scanner userInput = new Scanner(System.in);
 		String cityName;
 		System.out.print("Enter city: ");
 		cityName = userInput.next();
 		
-		String queryAgents = "SELECT * " +
-								"FROM AGENTS " +
-								"WHERE A_CITY = '" + cityName + "'";
+		String queryAgents = "SELECT * FROM AGENTS WHERE A_CITY = '" + cityName + "'";
 								
-		String queryClients = "SELECT * " +
-								"FROM CLIENTS " +
-								"WHERE C_CITY = '" + cityName + "'";											
+		String queryClients = "SELECT * FROM CLIENTS WHERE C_CITY = '" + cityName + "'";											
 								
+		System.out.println("All Agents in the requested city");
 		query(queryAgents);
+		System.out.println("All Clients in the requested city");
 		query(queryClients);
 	}
 
 	//Add user to CLIENTS table
+	//Part 2
 	public void addUser()throws SQLException {
 		try {
 			//Get highest ID value in CLIENTS table
@@ -118,11 +117,11 @@ public class HW4 {
 			//Ask for user details
 			Scanner userInput = new Scanner(System.in);
 			String userName, userCity, userZip;
-			System.out.print("Enter name: ");
+			System.out.print("Enter Client's name: ");
 			userName = userInput.next();
-			System.out.print("Enter city: ");
+			System.out.print("Enter Client's city: ");
 			userCity = userInput.next();
-			System.out.print("Enter zipcode: ");
+			System.out.print("Enter Client's zipcode: ");
 			userZip = userInput.next();
 			int userID = max + 1;
 			
@@ -133,42 +132,6 @@ public class HW4 {
 			
 			//Send the clients ID and city to lookupPolicy
 			lookupPolicy(userCity, userID);
-			userInput.close();
-		}
-		catch (Exception e) {
-            throw e;
-        }
-	}
-
-	//add a new agent
-	public void addAgent() throws SQLException
-	{
-		try {
-			//Get highest ID value in AGENTS table
-			statement = connection.createStatement();
-			int max = 0;
-			String queryID = "SELECT MAX(A_ID) from AGENTS";
-			ResultSet rs = statement.executeQuery(queryID);
-			if (rs.next()) 
-				max = rs.getInt(1);
-			
-			//Ask for user details
-			Scanner userInput = new Scanner(System.in);
-			String userName, userCity, userZip;
-			System.out.print("Enter city: ");
-			userCity = userInput.next();
-			System.out.print("Enter zipcode: ");
-			userZip = userInput.next();
-			System.out.print("Enter name: ");
-			userName = userInput.next();
-			int userID = max + 1;
-			
-			//Insert user ID into AGENTS table
-			insert("AGENTS", "'" + userID + "', '" + userName + "', '" + userCity + "', '" + userZip + "'");
-			String queryClients = "SELECT * FROM AGENTS";
-			query(queryClients);
-			
-			userInput.close();
 		}
 		catch (Exception e) {
             throw e;
@@ -176,44 +139,56 @@ public class HW4 {
 	}
 	
 	//Check agents and type of policy
+	//Part 2
 	public void lookupPolicy(String city, int clientID)throws SQLException {
         try {
 			Scanner userInput = new Scanner(System.in);
 			String type, amount;
 			int agentID;
+			System.out.println("Policies available for purchase: ");
+			String queryTypeIn = "SELECT TYPE FROM POLICY";
+			query(queryTypeIn);
 			System.out.print("Enter type of policy you want to purchase: ");
 			type = userInput.next();
 			
 			String queryType = "SELECT TYPE FROM POLICY WHERE TYPE = '" + type + "'";
 			ResultSet rsType = statement.executeQuery(queryType);
+			
 			//Check if policy type is found
 			if (rsType.next()) 
 			{
 				//Display all agents in the clients city
+				System.out.println("Available Agents: ");
 				String queryCity = "SELECT * FROM AGENTS WHERE A_CITY = '" + city + "'";
 				ResultSet rsCity = statement.executeQuery(queryCity);
-				query(queryCity);
 				
-				//POTENTIALLY ADD COUNT AND AUTO PICK AGENT IF ONLY ONE
-				//Let user select the client they want to purchase the policy from
-				System.out.print("Enter ID of the agent you want to purchase the policy from: ");
-				agentID = userInput.nextInt();				
-				String queryAgent = "SELECT A_ID FROM AGENTS WHERE A_CITY = '" + city + "' AND A_ID = '" + agentID +"'";
-				ResultSet rsAgent = statement.executeQuery(queryAgent);
-				//If selected agent is valid, send agent ID and client ID to buyPolicy
-				if (rsAgent.next()) 
+				//Check if agents in the client's city
+				if (rsCity.next())
 				{
-					agentID = rsAgent.getInt(1);
-					String queryAllP = "SELECT * FROM POLICY";
-					query(queryAllP);
-					buyPolicy(agentID, clientID);
+					query(queryCity);
+					//POTENTIALLY ADD COUNT AND AUTO PICK AGENT IF ONLY ONE
+					//Let user select the agent they want to purchase the policy from
+					System.out.print("Enter ID of the agent you want to purchase the policy from: ");
+					agentID = userInput.nextInt();				
+					String queryAgent = "SELECT A_ID FROM AGENTS WHERE A_CITY = '" + city + "' AND A_ID = '" + agentID +"'";
+					ResultSet rsAgent = statement.executeQuery(queryAgent);
+					//If selected agent is valid, send agent ID and client ID to buyPolicy
+					
+					if (rsAgent.next()) 
+					{
+						agentID = rsAgent.getInt(1);
+						String queryAllP = "SELECT * FROM POLICY";
+						query(queryAllP);
+						buyPolicy(agentID, clientID);
+					}
+					else
+						System.out.println("Not a valid agent");
 				}
 				else
-					System.out.println("Not a valid agent");
+					System.out.println("No Agents avaiable in that city.");
 			}
 			else
 				System.out.println("That type of policy isn't available");
-				userInput.close();
 		}
 		catch (Exception e) {
             throw e;
@@ -221,6 +196,7 @@ public class HW4 {
 	}
 
 	//Buy policy and insert into table
+	//Part 2
 	public void buyPolicy(int agentID, int clientID) throws SQLException {
 		try {
 			Scanner userInput = new Scanner(System.in);
@@ -256,7 +232,6 @@ public class HW4 {
 			}
 			else
 				System.out.println("POLICY_ID not available");
-			userInput.close();
 		}
 		catch (Exception e) {
             throw e;
@@ -264,6 +239,7 @@ public class HW4 {
 	}
 	
 	//List policies sold by agent
+	//Part 3
 	public void policiesSold()throws SQLException {
 		try {
 		Scanner userInput = new Scanner(System.in);
@@ -288,7 +264,6 @@ public class HW4 {
 		}
 		else
 			System.out.println("The agent was not found");
-		userInput.close();
 		}
 		catch (Exception e) {
             throw e;
@@ -296,6 +271,7 @@ public class HW4 {
 	}
 
 	//cancel a policy
+	//Part 4
 	public void cancelPolicy() throws SQLException
 	{
 		try {
@@ -308,9 +284,9 @@ public class HW4 {
 			purchID = userInput.next();
 
 			String queryPolicy = "DELETE FROM POLICIES_SOLD WHERE " +
-									"PURCHASE_ID = " + purchID;
+									"PURCHASE_ID = '" + purchID + "'";
 			queryUp(queryPolicy);
-			query(queryPoliciesSold);
+			//query(queryPoliciesSold);
 
 			/*//Get highest ID value in AGENTS table
 			statement = connection.createStatement();
@@ -335,8 +311,41 @@ public class HW4 {
 			insert("AGENTS", "'" + userID + "', '" + userName + "', '" + userCity + "', '" + userZip + "'");
 			String queryClients = "SELECT * FROM AGENTS";
 			query(queryClients);*/
+		}
+		catch (Exception e) {
+            throw e;
+        }
+	}
+	
+	//add a new agent
+	//Part 5
+	public void addAgent() throws SQLException
+	{
+		try {
+			//Get highest ID value in AGENTS table
+			statement = connection.createStatement();
+			int max = 0;
+			String queryID = "SELECT MAX(A_ID) from AGENTS";
+			ResultSet rs = statement.executeQuery(queryID);
+			if (rs.next()) 
+				max = rs.getInt(1);
 			
-			userInput.close();
+			//Ask for user details
+			Scanner userInput = new Scanner(System.in);
+			String userName, userCity, userZip;
+			System.out.print("Enter city: ");
+			userCity = userInput.next();
+			System.out.print("Enter zipcode: ");
+			userZip = userInput.next();
+			System.out.print("Enter name: ");
+			userName = userInput.next();
+			int userID = max + 1;
+			
+			//Insert user ID into AGENTS table
+			insert("AGENTS", "'" + userID + "', '" + userName + "', '" + userCity + "', '" + userZip + "'");
+			String queryClients = "SELECT * FROM AGENTS";
+			query(queryClients);
+			
 		}
 		catch (Exception e) {
             throw e;
@@ -367,8 +376,8 @@ public class HW4 {
     public void query(String q) {
         try {
             ResultSet resultSet = statement.executeQuery(q);
-            System.out.println("\n---------------------------------");
-            System.out.println("Query: \n" + q + "\n\nResult: ");
+            //System.out.println("\n---------------------------------");
+            //System.out.println("Query: \n" + q + "\n\nResult: ");
             print(resultSet);
         }
         catch (SQLException e) {
@@ -379,7 +388,7 @@ public class HW4 {
 	public void queryUp(String q) {
         try {
             int resultSet = statement.executeUpdate(q);
-            System.out.println("\n---------------------------------");
+            //System.out.println("\n---------------------------------");
             //System.out.println("Query: \n" + q + "\n\nResult: ");
             //print(resultSet);
         }
@@ -439,7 +448,7 @@ public class HW4 {
 		statement = connection.createStatement();
 		
 		//DELETE FROM HERE ON IF DON'T WANT TO DELETE DATABASE EACH TIME
-		/*statement.executeUpdate("DELETE from POLICIES_SOLD");
+		statement.executeUpdate("DELETE from POLICIES_SOLD");
         statement.executeUpdate("DELETE from CLIENTS");
         statement.executeUpdate("DELETE from AGENTS");
         statement.executeUpdate("DELETE from POLICY");
@@ -452,7 +461,7 @@ public class HW4 {
 		insert("CLIENTS", "106, 'CLAIRE', 'PHOENIX', 43214");
 
 		insert("AGENTS", "201, 'ANDREW', 'DALLAS', 43214");
-		insert("AGENTS", "202, 'PHILIP', 'PHEOENIX', 85011");
+		insert("AGENTS", "202, 'PHILIP', 'PHOENIX', 85011");
 		insert("AGENTS", "203, 'JERRY', 'BOSTON', 83125");
 		insert("AGENTS", "204, 'BRYAN', 'ROGERS', 78291");
 		insert("AGENTS", "205, 'TOMMY', 'DALLAS', 43214");
@@ -474,6 +483,6 @@ public class HW4 {
 		insert("POLICIES_SOLD", "407, 205, 103, 304, '2020-10-15', 5000.00");
 		insert("POLICIES_SOLD", "408, 204, 103, 304, '2020-02-15', 5000.00");
 		insert("POLICIES_SOLD", "409, 203, 103, 304, '2020-01-10', 5000.00");
-		insert("POLICIES_SOLD", "410, 202, 103, 303, '2020-01-30', 2000.00");*/
+		insert("POLICIES_SOLD", "410, 202, 103, 303, '2020-01-30', 2000.00");
     }
 }

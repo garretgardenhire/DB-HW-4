@@ -37,7 +37,7 @@ public class HW4 {
 				menu();
 				System.out.println("Enter Choice (by integer): ");
 				choice = userInput.nextInt();
-				switch(choice)  //it ends the program for some reason
+				switch(choice)  
 				{
 					case 1:
 						test.Agents();
@@ -287,7 +287,6 @@ public class HW4 {
 									"PURCHASE_ID = '" + purchID + "'";
 			queryUp(queryPolicy);
 			//query(queryPoliciesSold);
-			System.out.println("Policy " + purchID + " cancelled");
 		
 		}
 		catch (Exception e) {

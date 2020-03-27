@@ -287,30 +287,8 @@ public class HW4 {
 									"PURCHASE_ID = '" + purchID + "'";
 			queryUp(queryPolicy);
 			//query(queryPoliciesSold);
-
-			/*//Get highest ID value in AGENTS table
-			statement = connection.createStatement();
-			int max = 0;
-			String queryID = "SELECT MAX(A_ID) from AGENTS";
-			ResultSet rs = statement.executeQuery(queryID);
-			if (rs.next()) 
-				max = rs.getInt(1);
-			
-			//Ask for user details
-			Scanner userInput = new Scanner(System.in);
-			String userName, userCity, userZip;
-			System.out.print("Enter city: ");
-			userCity = userInput.next();
-			System.out.print("Enter zipcode: ");
-			userZip = userInput.next();
-			System.out.print("Enter name: ");
-			userName = userInput.next();
-			int userID = max + 1;
-			
-			//Insert user ID into AGENTS table
-			insert("AGENTS", "'" + userID + "', '" + userName + "', '" + userCity + "', '" + userZip + "'");
-			String queryClients = "SELECT * FROM AGENTS";
-			query(queryClients);*/
+			System.out.println("Policy " + purchID + " cancelled");
+		
 		}
 		catch (Exception e) {
             throw e;

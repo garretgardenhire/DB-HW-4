@@ -192,11 +192,11 @@ public class HW4 {
 					query(queryCity);
 					// POTENTIALLY ADD COUNT AND AUTO PICK AGENT IF ONLY ONE
 					// Let user select the agent they want to purchase the policy from
-					System.out.print("Enter ID of the agent you want to purchase the policy from: ");
+					System.out.print("Enter the ID of the agent you want to purchase the policy from: ");
 					agentID = userInput.next();
 
 					while (!agentID.matches("[0-9]+")) {
-						System.out.print("Enter the ID of the angent you want to purchase the policy from: ");
+						System.out.print("Enter the ID of the agent you want to purchase the policy from: ");
 						agentID = userInput.next();
 					}
 
@@ -227,7 +227,7 @@ public class HW4 {
 		try {
 			Scanner userInput = new Scanner(System.in);
 			String policyID, amount;
-			float amountFloat = 77000.01f;
+			double amountFloat = 77000.01f;
 			System.out.print("Enter the Policy ID you want to purchase: ");
 			policyID = userInput.next();
 
@@ -268,10 +268,11 @@ public class HW4 {
 						System.out.println(amount + " is not a valid float number");
 					} else {
 						// Checking valid float using parseInt() method
-						amountFloat = Float.parseFloat(amount);
+						amountFloat = Double.parseDouble(amount);
 						DecimalFormat df = new DecimalFormat("#.##");
-						amount = df.format(amount);
-						System.out.println(amount + " is a valid float number");
+						String updateAmount = df.format(amountFloat);
+						System.out.println(updateAmount + " is a valid float number");
+						amount = updateAmount;
 						break;
 					}
 

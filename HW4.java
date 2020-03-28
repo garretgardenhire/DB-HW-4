@@ -264,7 +264,7 @@ public class HW4 {
 				while (true) {
 					System.out.print("Enter the amount you want to purchase: ");
 					amount = userInput.next();
-					if (Integer.parseInt(amount) >= 10000 || Integer.parseInt(amount) <= 0) {
+					if (Float.parseFloat(amount) >= 10000 || Float.parseFloat(amount) <= 0) {
 						System.out.println(amount + " is not a valid float number");
 					} else {
 						// Checking valid float using parseInt() method

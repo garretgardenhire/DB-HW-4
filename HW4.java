@@ -74,7 +74,7 @@ public class HW4 {
 		System.out.println(" ");
 		System.out.println("Menu:");
 		System.out.println("1. Find all existing agents in a given city");
-		System.out.println("2. Purchase an avaiable policy from a particular agent");
+		System.out.println("2. Purchase an available policy from a particular agent");
 		System.out.println("3. List all policies sold by a particular agent");
 		System.out.println("4. Cancel a policy");
 		System.out.println("5. Add a new agent for a city");

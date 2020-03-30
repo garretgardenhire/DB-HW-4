@@ -144,6 +144,10 @@ public class HW4 {
 			userCity = truncate(userInput.next());
 			System.out.print("Enter Client's zipcode: ");
 			userZip = userInput.next();
+			while (!userZip.matches("[0-9]+")) {
+				System.out.print("Not a valide zipcode. Enter Client's zipcode: ");
+				userZip = userInput.next();
+			}
 
 			while (!userZip.matches("[0-9]+")) {
 				System.out.print("Enter Client's zipcode: ");
@@ -380,11 +384,15 @@ public class HW4 {
 			Scanner userInput = new Scanner(System.in);
 			String userName, userCity, userZip;
 			System.out.print("Enter city: ");
-			userCity = userInput.next();
+			userCity = truncate(userInput.next());
 			System.out.print("Enter zipcode: ");
 			userZip = userInput.next();
+			while (!userZip.matches("[0-9]+")) {
+				System.out.print("Not a valide zipcode. Enter Agent's zipcode: ");
+				userZip = userInput.next();
+			}
 			System.out.print("Enter name: ");
-			userName = userInput.next();
+			userName = truncate(userInput.next());
 			int userID = max + 1;
 
 			// Insert user ID into AGENTS table

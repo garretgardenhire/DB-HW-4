@@ -149,11 +149,6 @@ public class HW4 {
 				userZip = userInput.next();
 			}
 
-			while (!userZip.matches("[0-9]+")) {
-				System.out.print("Enter Client's zipcode: ");
-				userZip = userInput.next();
-			}
-
 			int userID = max + 1;
 
 			// Insert user ID into CLIENTS table

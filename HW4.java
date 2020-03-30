@@ -96,7 +96,7 @@ public class HW4 {
 			Scanner userInput = new Scanner(System.in);
 			String cityName;
 			System.out.print("Enter city: ");
-			cityName = truncate(userInput.next());
+			cityName = truncate(userInput.nextLine());
 
 			String queryAgents = "SELECT * FROM AGENTS WHERE A_CITY = '" + cityName + "'";
 			String queryClients = "SELECT * FROM CLIENTS WHERE C_CITY = '" + cityName + "'";
@@ -139,14 +139,14 @@ public class HW4 {
 			Scanner userInput = new Scanner(System.in);
 			String userName, userCity, userZip;
 			System.out.print("Enter Client's name: ");
-			userName = truncate(userInput.next());
+			userName = truncate(userInput.nextLine());
 			System.out.print("Enter Client's city: ");
-			userCity = truncate(userInput.next());
+			userCity = truncate(userInput.nextLine());
 			System.out.print("Enter Client's zipcode: ");
-			userZip = userInput.next();
+			userZip = userInput.nextLine();
 			while (!userZip.matches("[0-9]+")) {
 				System.out.print("Not a valide zipcode. Enter Client's zipcode: ");
-				userZip = userInput.next();
+				userZip = userInput.nextLine();
 			}
 
 			int userID = max + 1;
@@ -173,7 +173,7 @@ public class HW4 {
 			String queryTypeIn = "SELECT TYPE FROM POLICY";
 			query(queryTypeIn);
 			System.out.print("Enter type of policy you want to purchase: ");
-			type = truncate(userInput.next());
+			type = truncate(userInput.nextLine());
 
 			String queryType = "SELECT TYPE FROM POLICY WHERE TYPE = '" + type + "'";
 			ResultSet rsType = statement.executeQuery(queryType);
@@ -181,7 +181,7 @@ public class HW4 {
 			//Check if valid policy type
 			while (!rsType.next()) {
 				System.out.print("Policy type not available. Enter type of policy you want to purchase: ");
-				type = truncate(userInput.next());
+				type = truncate(userInput.nextLine());
 
 				queryType = "SELECT TYPE FROM POLICY WHERE TYPE = '" + type + "'";
 				rsType = statement.executeQuery(queryType);
@@ -197,14 +197,14 @@ public class HW4 {
 				query(queryCity);
 				// Let user select the agent they want to purchase the policy from
 				System.out.print("Enter the ID of the agent you want to purchase the policy from: ");
-				agentID = userInput.next();
+				agentID = userInput.nextLine();
 				String queryAgent = "SELECT A_ID FROM AGENTS WHERE A_CITY = '" + city + "' AND A_ID = '" + agentID + "'";
 				ResultSet rsAgent = statement.executeQuery(queryAgent);
 
 				//Check if user enters valid Agent ID
 				while (!agentID.matches("[0-9]+") || !rsAgent.next()) {
 					System.out.print("Not a valid Agent ID. Enter the ID of the agent you want to purchase the policy from: ");
-					agentID = userInput.next();
+					agentID = userInput.nextLine();
 					
 					queryAgent = "SELECT A_ID FROM AGENTS WHERE A_CITY = '" + city + "' AND A_ID = '" + agentID + "'";
 					rsAgent = statement.executeQuery(queryAgent);
@@ -236,14 +236,14 @@ public class HW4 {
 			String queryPolicy = "SELECT * FROM POLICY WHERE TYPE = '" + type + "'";
 			query(queryPolicy);
 			System.out.print("Enter the Policy ID you want to purchase: ");
-			policyID = userInput.next();
+			policyID = userInput.nextLine();
 			
 			String queryPID = "SELECT POLICY_ID FROM POLICY WHERE TYPE = '" + type + "' AND POLICY_ID = '" + policyID + "'" ;
 			ResultSet rsPID = statement.executeQuery(queryPID);
 
 			while (!policyID.matches("[0-9]+") || !rsPID.next()) {
 				System.out.print("Not a valid policy number. Enter the Policy ID you want to purchase: ");
-				policyID = userInput.next();
+				policyID = userInput.nextLine();
 				queryPID = "SELECT POLICY_ID FROM POLICY WHERE TYPE = '" + type + "' AND POLICY_ID = '" + policyID + "'" ;
 				rsPID = statement.executeQuery(queryPID);
 			}
@@ -262,7 +262,7 @@ public class HW4 {
 
 				while (true) {
 					System.out.print("Enter the amount you want to purchase: ");
-					amount = userInput.next();
+					amount = userInput.nextLine();
 
 					try
 					{ 
@@ -310,9 +310,9 @@ public class HW4 {
 			Scanner userInput = new Scanner(System.in);
 			String agentCity, agentName;
 			System.out.print("Enter Agent's name: ");
-			agentName = truncate(userInput.next());
+			agentName = truncate(userInput.nextLine());
 			System.out.print("Enter Agent's city: ");
-			agentCity = truncate(userInput.next());
+			agentCity = truncate(userInput.nextLine());
 
 			String queryAgentID = "SELECT A_ID FROM AGENTS WHERE A_NAME = '" + agentName + "' AND A_CITY = '"
 					+ agentCity + "'";
@@ -320,12 +320,22 @@ public class HW4 {
 			// Check if agent is found
 			if (rsAgentID.next()) {
 				int agentID = rsAgentID.getInt(1);
-				System.out.println("The agent was found");
-				String queryPoliciesSold = "SELECT P.NAME, P.TYPE, P.COMMISSION_PERCENTAGE "
+				
+				String queryCheckSold = "SELECT P.TYPE "
 						+ "FROM POLICY P, POLICIES_SOLD PS " + "WHERE PS.AGENT_ID = '" + agentID
 						+ "' AND PS.POLICY_ID = P.POLICY_ID";
+				ResultSet rsCheckSold = statement.executeQuery(queryCheckSold);
+				
+				if (rsCheckSold.next()) {
 
-				query(queryPoliciesSold);
+					String queryPoliciesSold = "SELECT P.NAME, P.TYPE, P.COMMISSION_PERCENTAGE "
+							+ "FROM POLICY P, POLICIES_SOLD PS " + "WHERE PS.AGENT_ID = '" + agentID
+							+ "' AND PS.POLICY_ID = P.POLICY_ID";
+
+					query(queryPoliciesSold);
+				}
+				else
+					System.out.println("No policies sold by agent.");
 			} else
 				System.out.println("The agent was not found");
 		} catch (Exception e) {
@@ -343,14 +353,14 @@ public class HW4 {
 			Scanner userInput = new Scanner(System.in);
 			String purchID;
 			System.out.println("Enter Purchase ID of policy to be cancelled: ");
-			purchID = userInput.next();
+			purchID = userInput.nextLine();
 			
 			String queryPSID = "SELECT PURCHASE_ID FROM POLICIES_SOLD WHERE PURCHASE_ID = '" + purchID + "'";
 			ResultSet rsPSID = statement.executeQuery(queryPSID);
 
 			while (!purchID.matches("[0-9]+") || !rsPSID.next()) {
 				System.out.print("Not a valid ID. Enter Purchase ID of policy to be cancelled: ");
-				purchID = userInput.next();
+				purchID = userInput.nextLine();
 				queryPSID = "SELECT PURCHASE_ID FROM POLICIES_SOLD WHERE PURCHASE_ID = '" + purchID + "'";
 				rsPSID = statement.executeQuery(queryPSID);
 			}
@@ -379,15 +389,15 @@ public class HW4 {
 			Scanner userInput = new Scanner(System.in);
 			String userName, userCity, userZip;
 			System.out.print("Enter city: ");
-			userCity = truncate(userInput.next());
+			userCity = truncate(userInput.nextLine());
 			System.out.print("Enter zipcode: ");
-			userZip = userInput.next();
+			userZip = userInput.nextLine();
 			while (!userZip.matches("[0-9]+")) {
 				System.out.print("Not a valide zipcode. Enter Agent's zipcode: ");
-				userZip = userInput.next();
+				userZip = userInput.nextLine();
 			}
 			System.out.print("Enter name: ");
-			userName = truncate(userInput.next());
+			userName = truncate(userInput.nextLine());
 			int userID = max + 1;
 
 			// Insert user ID into AGENTS table

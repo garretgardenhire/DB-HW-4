@@ -264,22 +264,27 @@ public class HW4 {
 				while (true) {
 					System.out.print("Enter the amount you want to purchase: ");
 					amount = userInput.next();
-					//Check if user enters a number
-					if (amount.matches("[0-9]+")){
-						//Check if user enters a valid float
-						if (Float.parseFloat(amount) >= 10000 || Float.parseFloat(amount) <= 0){
-							System.out.print(amount + " is not a valid amount. ");
-						} 
-						else {
-							// Checking valid float using parseInt() method
-							amountFloat = Double.parseDouble(amount);
-							DecimalFormat df = new DecimalFormat("#.##");
-							String updateAmount = df.format(amountFloat);
-							amount = updateAmount;
-							break;
-						}
-					}
-				}
+
+					try
+					{ 
+						// checking valid float using parseInt() method 
+						Float.parseFloat(amount);  
+						if (Float.parseFloat(amount) >= 10000 || Float.parseFloat(amount) <= 0)
+							throw new NumberFormatException ("Not a valide amount. ");
+
+						break;
+
+					} 
+					catch (NumberFormatException ignore) 
+					{ 
+						System.out.println(amount + " is not a valid amount. "); 
+					} 	
+			}
+				
+				amountFloat = Double.parseDouble(amount);
+				DecimalFormat df = new DecimalFormat("#.##");
+				String updateAmount = df.format(amountFloat);
+				amount = updateAmount;
 
 				// Get highest ID value in POLICIES_SOLD table
 				int max = 0;

@@ -40,7 +40,6 @@ public class HW4 {
 				choice = userInput.nextInt();
 				switch (choice) {
 					case 1:
-						test.buyPolicy("204", 116);
 						test.Agents();
 						break;
 					case 2:
@@ -179,43 +178,47 @@ public class HW4 {
 
 			String queryType = "SELECT TYPE FROM POLICY WHERE TYPE = '" + type + "'";
 			ResultSet rsType = statement.executeQuery(queryType);
+			
+			//Check if valid policy type
+			while (!rsType.next()) {
+				System.out.print("Policy type not available. Enter type of policy you want to purchase: ");
+				type = truncate(userInput.next());
 
-			// Check if policy type is found
-			if (rsType.next()) {
-				// Display all agents in the clients city
-				System.out.println("Available Agents: ");
-				String queryCity = "SELECT * FROM AGENTS WHERE A_CITY = '" + city + "'";
-				ResultSet rsCity = statement.executeQuery(queryCity);
+				queryType = "SELECT TYPE FROM POLICY WHERE TYPE = '" + type + "'";
+				rsType = statement.executeQuery(queryType);
+			}
 
-				// Check if agents in the client's city
-				if (rsCity.next()) {
-					query(queryCity);
-					// POTENTIALLY ADD COUNT AND AUTO PICK AGENT IF ONLY ONE
-					// Let user select the agent they want to purchase the policy from
-					System.out.print("Enter the ID of the agent you want to purchase the policy from: ");
+			// Display all agents in the clients city
+			System.out.println("Available Agents: ");
+			String queryCity = "SELECT * FROM AGENTS WHERE A_CITY = '" + city + "'";
+			ResultSet rsCity = statement.executeQuery(queryCity);
+
+			// Check if agents in the client's city
+			if (rsCity.next()) {
+				query(queryCity);
+				// Let user select the agent they want to purchase the policy from
+				System.out.print("Enter the ID of the agent you want to purchase the policy from: ");
+				agentID = userInput.next();
+				String queryAgent = "SELECT A_ID FROM AGENTS WHERE A_CITY = '" + city + "' AND A_ID = '" + agentID + "'";
+				ResultSet rsAgent = statement.executeQuery(queryAgent);
+
+				//Check if user enters valid Agent ID
+				while (!agentID.matches("[0-9]+") || !rsAgent.next()) {
+					System.out.print("Not a valid Agent ID. Enter the ID of the agent you want to purchase the policy from: ");
 					agentID = userInput.next();
+					
+					queryAgent = "SELECT A_ID FROM AGENTS WHERE A_CITY = '" + city + "' AND A_ID = '" + agentID + "'";
+					rsAgent = statement.executeQuery(queryAgent);
+				}
+					
+				//Send agent ID and client ID to buyPolicy
+				agentID = rsAgent.getString(1);
+				buyPolicy(agentID, clientID, type);
 
-					while (!agentID.matches("[0-9]+")) {
-						System.out.print("Enter the ID of the agent you want to purchase the policy from: ");
-						agentID = userInput.next();
-					}
+			} 
+			else
+				System.out.println("No Agents avaiable in that city.");
 
-					String queryAgent = "SELECT A_ID FROM AGENTS WHERE A_CITY = '" + city + "' AND A_ID = '" + agentID
-							+ "'";
-					ResultSet rsAgent = statement.executeQuery(queryAgent);
-					// If selected agent is valid, send agent ID and client ID to buyPolicy
-
-					if (rsAgent.next()) {
-						agentID = rsAgent.getString(1);
-						String queryAllP = "SELECT * FROM POLICY";
-						query(queryAllP);
-						buyPolicy(agentID, clientID);
-					} else
-						System.out.println("Not a valid agent");
-				} else
-					System.out.println("No Agents avaiable in that city.");
-			} else
-				System.out.println("That type of policy isn't available");
 		} catch (Exception e) {
 			throw e;
 		}
@@ -223,17 +226,27 @@ public class HW4 {
 
 	// Buy policy and insert into table
 	// Part 2
-	public void buyPolicy(String agentID, int clientID) throws SQLException {
+	public void buyPolicy(String agentID, int clientID, String type) throws SQLException {
 		try {
 			Scanner userInput = new Scanner(System.in);
 			String policyID, amount;
-			double amountFloat = 77000.01f;
+			double amountFloat;
+			
+			//Show policies that match the clients requested type
+			System.out.println("Available Policies: ");
+			String queryPolicy = "SELECT * FROM POLICY WHERE TYPE = '" + type + "'";
+			query(queryPolicy);
 			System.out.print("Enter the Policy ID you want to purchase: ");
 			policyID = userInput.next();
+			
+			String queryPID = "SELECT POLICY_ID FROM POLICY WHERE TYPE = '" + type + "' AND POLICY_ID = '" + policyID + "'" ;
+			ResultSet rsPID = statement.executeQuery(queryPID);
 
-			while (!policyID.matches("[0-9]+")) {
-				System.out.print("Enter the Policy ID you want to purchase: ");
+			while (!policyID.matches("[0-9]+") || !rsPID.next()) {
+				System.out.print("Not a valid policy number. Enter the Policy ID you want to purchase: ");
 				policyID = userInput.next();
+				queryPID = "SELECT POLICY_ID FROM POLICY WHERE TYPE = '" + type + "' AND POLICY_ID = '" + policyID + "'" ;
+				rsPID = statement.executeQuery(queryPID);
 			}
 
 			String queryComPer = "SELECT COMMISSION_PERCENTAGE FROM POLICY WHERE POLICY_ID = '" + policyID + "'";
@@ -248,34 +261,24 @@ public class HW4 {
 
 				amount = "a";
 
-				/*
-				 * while (true && amountFloat < 10000.00) { try {
-				 * System.out.print("Enter the amount you want to purchase: "); amount =
-				 * userInput.next(); //Checking valid float using parseInt() method amountFloat
-				 * = Float.parseFloat(amount); DecimalFormat df = new DecimalFormat("#.##");
-				 * amount = df.format(amount);
-				 * 
-				 * System.out.println(amount + " is a valid float number");
-				 * 
-				 * break; } catch (NumberFormatException e) { System.out.println(amount +
-				 * " is not a valid float number"); continue; } }
-				 */
-
 				while (true) {
 					System.out.print("Enter the amount you want to purchase: ");
 					amount = userInput.next();
-					if (Float.parseFloat(amount) >= 10000 || Float.parseFloat(amount) <= 0) {
-						System.out.println(amount + " is not a valid float number");
-					} else {
-						// Checking valid float using parseInt() method
-						amountFloat = Double.parseDouble(amount);
-						DecimalFormat df = new DecimalFormat("#.##");
-						String updateAmount = df.format(amountFloat);
-						System.out.println(updateAmount + " is a valid float number");
-						amount = updateAmount;
-						break;
+					//Check if user enters a number
+					if (amount.matches("[0-9]+")){
+						//Check if user enters a valid float
+						if (Float.parseFloat(amount) >= 10000 || Float.parseFloat(amount) <= 0){
+							System.out.print(amount + " is not a valid amount. ");
+						} 
+						else {
+							// Checking valid float using parseInt() method
+							amountFloat = Double.parseDouble(amount);
+							DecimalFormat df = new DecimalFormat("#.##");
+							String updateAmount = df.format(amountFloat);
+							amount = updateAmount;
+							break;
+						}
 					}
-
 				}
 
 				// Get highest ID value in POLICIES_SOLD table
@@ -284,8 +287,8 @@ public class HW4 {
 				ResultSet rs = statement.executeQuery(queryID);
 				if (rs.next())
 					max = rs.getInt(1);
-				int policiessoldID = max + 1;
-				insert("POLICIES_SOLD", "'" + policiessoldID + "', '" + agentID + "', '" + clientID + "', '" + policyID
+				int policiesSoldID = max + 1;
+				insert("POLICIES_SOLD", "'" + policiesSoldID + "', '" + agentID + "', '" + clientID + "', '" + policyID
 						+ "', '" + sqlDate + "' , '" + amount + "'");
 				String queryAllPS = "SELECT * FROM POLICIES_SOLD";
 				query(queryAllPS);
@@ -337,10 +340,20 @@ public class HW4 {
 			String purchID;
 			System.out.println("Enter Purchase ID of policy to be cancelled: ");
 			purchID = userInput.next();
+			
+			String queryPSID = "SELECT PURCHASE_ID FROM POLICIES_SOLD WHERE PURCHASE_ID = '" + purchID + "'";
+			ResultSet rsPSID = statement.executeQuery(queryPSID);
+
+			while (!purchID.matches("[0-9]+") || !rsPSID.next()) {
+				System.out.print("Not a valid ID. Enter Purchase ID of policy to be cancelled: ");
+				purchID = userInput.next();
+				queryPSID = "SELECT PURCHASE_ID FROM POLICIES_SOLD WHERE PURCHASE_ID = '" + purchID + "'";
+				rsPSID = statement.executeQuery(queryPSID);
+			}
 
 			String queryPolicy = "DELETE FROM POLICIES_SOLD WHERE " + "PURCHASE_ID = '" + purchID + "'";
 			queryUp(queryPolicy);
-			// query(queryPoliciesSold);
+
 		} catch (Exception e) {
 			throw e;
 		}

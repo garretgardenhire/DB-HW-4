@@ -69,6 +69,7 @@ public class HW4 {
 
 	}
 
+	// Menu of choices for user
 	static public void menu() {
 		System.out.println(" ");
 		System.out.println("Menu:");
@@ -81,10 +82,10 @@ public class HW4 {
 		System.out.println(" ");
 	}
 
+	// Truncate strings to SQL entry length
 	public String truncate(String word) {
 		if (word.length() > 50) {
 			word = word.substring(0, 49);
-			System.out.println("Entry has been truncated.");
 		}
 		return word;
 	}
@@ -102,15 +103,16 @@ public class HW4 {
 			String queryClients = "SELECT * FROM CLIENTS WHERE C_CITY = '" + cityName + "'";
 			String queryAgentsCheck = "SELECT A_CITY FROM AGENTS WHERE A_CITY = '" + cityName + "'";
 			String queryClientsCheck = "SELECT C_CITY FROM CLIENTS WHERE C_CITY = '" + cityName + "'";
+			
+			// Check if agents exist so no empty query
 			ResultSet rsAgents = statement.executeQuery(queryAgentsCheck);
-
-			// Check if policy type is found
 			if (rsAgents.next()) {
 				System.out.println("All Agents in the requested city");
 				query(queryAgents);
 			} else
 				System.out.println("No Agents in that city");
 
+			//Check if clients exist so no empty query
 			ResultSet rsClients = statement.executeQuery(queryClientsCheck);
 			if (rsClients.next()) {
 				System.out.println("All Clients in the requested city");
@@ -178,7 +180,7 @@ public class HW4 {
 			String queryType = "SELECT TYPE FROM POLICY WHERE TYPE = '" + type + "'";
 			ResultSet rsType = statement.executeQuery(queryType);
 			
-			//Check if valid policy type
+			// Check if valid policy type
 			while (!rsType.next()) {
 				System.out.print("Policy type not available. Enter type of policy you want to purchase: ");
 				type = truncate(userInput.nextLine());
@@ -201,7 +203,7 @@ public class HW4 {
 				String queryAgent = "SELECT A_ID FROM AGENTS WHERE A_CITY = '" + city + "' AND A_ID = '" + agentID + "'";
 				ResultSet rsAgent = statement.executeQuery(queryAgent);
 
-				//Check if user enters valid Agent ID
+				// Check if user enters valid Agent ID
 				while (!agentID.matches("[0-9]+") || !rsAgent.next()) {
 					System.out.print("Not a valid Agent ID. Enter the ID of the agent you want to purchase the policy from: ");
 					agentID = userInput.nextLine();
@@ -210,7 +212,7 @@ public class HW4 {
 					rsAgent = statement.executeQuery(queryAgent);
 				}
 					
-				//Send agent ID and client ID to buyPolicy
+				// Send agent ID and client ID to buyPolicy
 				agentID = rsAgent.getString(1);
 				buyPolicy(agentID, clientID, type);
 
@@ -231,7 +233,7 @@ public class HW4 {
 			String policyID, amount;
 			double amountFloat;
 			
-			//Show policies that match the clients requested type
+			// Show policies that match the clients requested type
 			System.out.println("Available Policies: ");
 			String queryPolicy = "SELECT * FROM POLICY WHERE TYPE = '" + type + "'";
 			query(queryPolicy);
@@ -241,6 +243,7 @@ public class HW4 {
 			String queryPID = "SELECT POLICY_ID FROM POLICY WHERE TYPE = '" + type + "' AND POLICY_ID = '" + policyID + "'" ;
 			ResultSet rsPID = statement.executeQuery(queryPID);
 
+			// Check if policy ID is a correct number
 			while (!policyID.matches("[0-9]+") || !rsPID.next()) {
 				System.out.print("Not a valid policy number. Enter the Policy ID you want to purchase: ");
 				policyID = userInput.nextLine();
@@ -260,6 +263,7 @@ public class HW4 {
 
 				amount = "a";
 
+				// Check if user enters valid number
 				while (true) {
 					System.out.print("Enter the amount you want to purchase: ");
 					amount = userInput.nextLine();
@@ -279,7 +283,7 @@ public class HW4 {
 						System.out.println(amount + " is not a valid amount. "); 
 					} 	
 			}
-				
+				// Format float for SQL table
 				amountFloat = Double.parseDouble(amount);
 				DecimalFormat df = new DecimalFormat("#.##");
 				String updateAmount = df.format(amountFloat);
@@ -326,6 +330,7 @@ public class HW4 {
 						+ "' AND PS.POLICY_ID = P.POLICY_ID";
 				ResultSet rsCheckSold = statement.executeQuery(queryCheckSold);
 				
+				//Check if the agent has sold policies to ensure no empty queries
 				if (rsCheckSold.next()) {
 
 					String queryPoliciesSold = "SELECT P.NAME, P.TYPE, P.COMMISSION_PERCENTAGE "
@@ -343,37 +348,44 @@ public class HW4 {
 		}
 	}
 
-	// cancel a policy
+	// Cancel a policy
 	// Part 4
 	public void cancelPolicy() throws SQLException {
 		try {
-			String queryPoliciesSold = "SELECT * FROM POLICIES_SOLD";
-			query(queryPoliciesSold);
+			String queryCheck = "SELECT PURCHASE_ID FROM POLICIES_SOLD";
+			ResultSet rsCheck = statement.executeQuery(queryCheck);
+			if (rsCheck.next()) {
+				String queryPoliciesSold = "SELECT * FROM POLICIES_SOLD";
+				query(queryPoliciesSold);
 
-			Scanner userInput = new Scanner(System.in);
-			String purchID;
-			System.out.println("Enter Purchase ID of policy to be cancelled: ");
-			purchID = userInput.nextLine();
-			
-			String queryPSID = "SELECT PURCHASE_ID FROM POLICIES_SOLD WHERE PURCHASE_ID = '" + purchID + "'";
-			ResultSet rsPSID = statement.executeQuery(queryPSID);
-
-			while (!purchID.matches("[0-9]+") || !rsPSID.next()) {
-				System.out.print("Not a valid ID. Enter Purchase ID of policy to be cancelled: ");
+				Scanner userInput = new Scanner(System.in);
+				String purchID;
+				System.out.println("Enter Purchase ID of policy to be cancelled: ");
 				purchID = userInput.nextLine();
-				queryPSID = "SELECT PURCHASE_ID FROM POLICIES_SOLD WHERE PURCHASE_ID = '" + purchID + "'";
-				rsPSID = statement.executeQuery(queryPSID);
-			}
+				
+				String queryPSID = "SELECT PURCHASE_ID FROM POLICIES_SOLD WHERE PURCHASE_ID = '" + purchID + "'";
+				ResultSet rsPSID = statement.executeQuery(queryPSID);
 
-			String queryPolicy = "DELETE FROM POLICIES_SOLD WHERE " + "PURCHASE_ID = '" + purchID + "'";
-			queryUp(queryPolicy);
+				// Check if user inputs valid number
+				while (!purchID.matches("[0-9]+") || !rsPSID.next()) {
+					System.out.print("Not a valid ID. Enter Purchase ID of policy to be cancelled: ");
+					purchID = userInput.nextLine();
+					queryPSID = "SELECT PURCHASE_ID FROM POLICIES_SOLD WHERE PURCHASE_ID = '" + purchID + "'";
+					rsPSID = statement.executeQuery(queryPSID);
+				}
+
+				String queryPolicy = "DELETE FROM POLICIES_SOLD WHERE " + "PURCHASE_ID = '" + purchID + "'";
+				queryUp(queryPolicy);
+			}
+			else
+				System.out.println("No policies available to delete");
 
 		} catch (Exception e) {
 			throw e;
 		}
 	}
 
-	// add a new agent
+	// Add a new agent
 	// Part 5
 	public void addAgent() throws SQLException {
 		try {
@@ -392,6 +404,8 @@ public class HW4 {
 			userCity = truncate(userInput.nextLine());
 			System.out.print("Enter zipcode: ");
 			userZip = userInput.nextLine();
+			
+			// Check if user inputs valid number
 			while (!userZip.matches("[0-9]+")) {
 				System.out.print("Not a valide zipcode. Enter Agent's zipcode: ");
 				userZip = userInput.nextLine();
@@ -502,43 +516,43 @@ public class HW4 {
 	public void initDatabase(String Username, String Password, String SchemaName) throws SQLException {
 		statement = connection.createStatement();
 
-		// DELETE FROM HERE ON IF DON'T WANT TO DELETE DATABASE EACH TIME
-		/*
-		 * statement.executeUpdate("DELETE from POLICIES_SOLD");
-		 * statement.executeUpdate("DELETE from CLIENTS");
-		 * statement.executeUpdate("DELETE from AGENTS");
-		 * statement.executeUpdate("DELETE from POLICY");
-		 * 
-		 * insert("CLIENTS", "101, 'CHRIS', 'DALLAS', 43214"); insert("CLIENTS",
-		 * "102, 'OLIVIA', 'BOSTON', 83125"); insert("CLIENTS",
-		 * "103, 'ETHAN', 'FAYETTEVILLE', 72701"); insert("CLIENTS",
-		 * "104, 'DANIEL', 'NEWYORK', 53421"); insert("CLIENTS",
-		 * "105, 'TAYLOR', 'ROGERS', 78291"); insert("CLIENTS",
-		 * "106, 'CLAIRE', 'PHOENIX', 43214");
-		 * 
-		 * insert("AGENTS", "201, 'ANDREW', 'DALLAS', 43214"); insert("AGENTS",
-		 * "202, 'PHILIP', 'PHOENIX', 85011"); insert("AGENTS",
-		 * "203, 'JERRY', 'BOSTON', 83125"); insert("AGENTS",
-		 * "204, 'BRYAN', 'ROGERS', 78291"); insert("AGENTS",
-		 * "205, 'TOMMY', 'DALLAS', 43214"); insert("AGENTS",
-		 * "206, 'BRANT', 'FAYETTEVILLE', 72701"); insert("AGENTS",
-		 * "207, 'SMITH', 'ROGERS', 78291");
-		 * 
-		 * insert("POLICY", "301, 'CIGNAHEALTH', 'DENTAL', 5"); insert("POLICY",
-		 * "302, 'GOLD', 'LIFE', 8"); insert("POLICY", "303, 'WELLCARE', 'HOME', 10");
-		 * insert("POLICY", "304, 'UNITEDHEALTH', 'HEALTH', 7"); insert("POLICY",
-		 * "305, 'UNITEDCAR', 'VEHICLE', 9");
-		 * 
-		 * insert("POLICIES_SOLD", "401, 204, 106, 303, '2020-01-02', 2000.00");
-		 * insert("POLICIES_SOLD", "402, 201, 105, 305, '2019-08-11', 1500.00");
-		 * insert("POLICIES_SOLD", "403, 203, 106, 301, '2019-09-08', 3000.00");
-		 * insert("POLICIES_SOLD", "404, 207, 101, 305, '2019-06-21', 1500.00");
-		 * insert("POLICIES_SOLD", "405, 203, 104, 302, '2019-11-14', 4500.00");
-		 * insert("POLICIES_SOLD", "406, 207, 105, 305, '2019-12-25', 1500.00");
-		 * insert("POLICIES_SOLD", "407, 205, 103, 304, '2020-10-15', 5000.00");
-		 * insert("POLICIES_SOLD", "408, 204, 103, 304, '2020-02-15', 5000.00");
-		 * insert("POLICIES_SOLD", "409, 203, 103, 304, '2020-01-10', 5000.00");
-		 * insert("POLICIES_SOLD", "410, 202, 103, 303, '2020-01-30', 2000.00");
-		 */
+		// Reseting database to hw3
+		/*statement.executeUpdate("DELETE from POLICIES_SOLD");
+		statement.executeUpdate("DELETE from CLIENTS");
+		statement.executeUpdate("DELETE from AGENTS");
+		statement.executeUpdate("DELETE from POLICY");
+		 
+		insert("CLIENTS", "101, 'CHRIS', 'DALLAS', 43214"); 
+		insert("CLIENTS", "102, 'OLIVIA', 'BOSTON', 83125"); 
+		insert("CLIENTS", "103, 'ETHAN', 'FAYETTEVILLE', 72701"); 
+		insert("CLIENTS", "104, 'DANIEL', 'NEWYORK', 53421"); 
+		insert("CLIENTS", "105, 'TAYLOR', 'ROGERS', 78291"); 
+		insert("CLIENTS", "106, 'CLAIRE', 'PHOENIX', 43214");
+		 
+		 insert("AGENTS", "201, 'ANDREW', 'DALLAS', 43214"); 
+		 insert("AGENTS", "202, 'PHILIP', 'PHOENIX', 85011");
+		 insert("AGENTS", "203, 'JERRY', 'BOSTON', 83125"); 
+		 insert("AGENTS", "204, 'BRYAN', 'ROGERS', 78291"); 
+		 insert("AGENTS", "205, 'TOMMY', 'DALLAS', 43214");
+		 insert("AGENTS", "206, 'BRANT', 'FAYETTEVILLE', 72701"); 
+		 insert("AGENTS", "207, 'SMITH', 'ROGERS', 78291");
+		  
+		 insert("POLICY", "301, 'CIGNAHEALTH', 'DENTAL', 5"); 
+		 insert("POLICY", "302, 'GOLD', 'LIFE', 8"); 
+		 insert("POLICY", "303, 'WELLCARE', 'HOME', 10");
+		 insert("POLICY", "304, 'UNITEDHEALTH', 'HEALTH', 7"); 
+		 insert("POLICY", "305, 'UNITEDCAR', 'VEHICLE', 9");
+		  
+		 insert("POLICIES_SOLD", "401, 204, 106, 303, '2020-01-02', 2000.00");
+		 insert("POLICIES_SOLD", "402, 201, 105, 305, '2019-08-11', 1500.00");
+		 insert("POLICIES_SOLD", "403, 203, 106, 301, '2019-09-08', 3000.00");
+		 insert("POLICIES_SOLD", "404, 207, 101, 305, '2019-06-21', 1500.00");
+		 insert("POLICIES_SOLD", "405, 203, 104, 302, '2019-11-14', 4500.00");
+		 insert("POLICIES_SOLD", "406, 207, 105, 305, '2019-12-25', 1500.00");
+		 insert("POLICIES_SOLD", "407, 205, 103, 304, '2020-10-15', 5000.00");
+		 insert("POLICIES_SOLD", "408, 204, 103, 304, '2020-02-15', 5000.00");
+		 insert("POLICIES_SOLD", "409, 203, 103, 304, '2020-01-10', 5000.00");
+		 insert("POLICIES_SOLD", "410, 202, 103, 303, '2020-01-30', 2000.00");*/
+		 
 	}
 }
